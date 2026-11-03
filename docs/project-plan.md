@@ -52,7 +52,7 @@ Use it as historical example data until those conditions are established. Distin
 
 ## Recommended teaching approach
 
-Use the official Tiny Tapeout GitHub template and Actions as the primary path. This matches the source's submission objective and lets students reach the core learning goals before undertaking a local physical-design installation. Develop the local LibreLane material as a companion lab; make it mandatory if local implementation is a course learning objective.
+Use the official SKY130 Tiny Tapeout template and Actions for submission-compatible builds. Local LibreLane work is also required, using a preinstalled Ubuntu VirtualBox image. Students start with the supplied environment rather than installing the tools themselves. Staff preparation instructions are retained in [vm-preparation.md](vm-preparation.md).
 
 Begin with one small sequential example that has explicit reset and easily checked outputs. Carry that example through every chapter, then have students repeat the process with their own FPGA project. Keep this instructional repository separate from each student's chip submission repository.
 
@@ -69,7 +69,7 @@ The first conversion is available as [Prepare a Tiny Tapeout project](tiny-tapeo
 | `docs/04-functional-verification.md` | Run meaningful tests, inspect waveforms, and demonstrate reset and required behavior. |
 | `docs/05-gds-and-reports.md` | Generate GDSII through Actions; inspect layout, timing, area, and required physical/precheck results for the same commit. |
 | `docs/06-documentation-and-submission.md` | Complete the design datasheet and hardware test procedure; submit and verify the intended revision when authorized. |
-| `docs/07-local-librelane.md` | Install and smoke-test the supported local environment, run a documented example, and inspect layout in KLayout. |
+| `docs/07-local-librelane.md` | Start and smoke-test the preinstalled course VM, run a documented example, and inspect layout in KLayout. |
 | `docs/troubleshooting.md` | Diagnose common source, wrapper, simulation, installation, configuration, and implementation failures. |
 | `exercises/` | Practice with a worked example and adapt a personal project; use small, runnable assets with expected behavior. |
 
@@ -77,7 +77,7 @@ Each chapter should have prerequisites, numbered tasks, editable examples, expec
 
 ## Implementation phases
 
-1. **Establish the baseline.** Confirm SKY130 or another target, shuttle, template commit, host environments, whether local LibreLane is required, and the representative design. Capture course choices in one maintained baseline page. Exit: the example and toolchain are reproducible in principle and the remaining unknowns are explicit.
+1. **Establish the baseline.** Use SKY130 and required local LibreLane in the preinstalled Ubuntu VirtualBox image. Select a template commit, VM/tool versions, supported hosts, and representative design. Capture remaining submission decisions when available. Exit: the example and toolchain are reproducible in principle and the remaining unknowns are explicit.
 2. **Build the verified example.** Adapt portable RTL, implement the wrapper and metadata, and write behavior-based tests. Run the supported flow and capture a successful GDS build plus timing and physical-check evidence. Exit: students have a tested reference to compare against. Record any gate-level simulation performed and its limitations.
 3. **Rewrite the guide.** Convert both Word documents into the chapter sequence above, applying the technical corrections. Add a glossary, pin mapping table, diagrams where useful, report interpretation, and instructor checkpoints. Exit: every instruction has an expected result and all sample values have context.
 4. **Validate the learning path.** Follow the guide from a fresh student repository, test its copyable commands, validate links and Markdown, and pilot it with a student or TA. Exit: observed failures have actionable troubleshooting and the pilot can reach a submission-ready revision.
@@ -85,12 +85,26 @@ Each chapter should have prerequisites, numbered tasks, editable examples, expec
 
 The existing remote is [lucask07/230_tapeouts](https://github.com/lucask07/230_tapeouts). No push, Pages deployment, student submission, or fabrication order has been performed in this planning pass. GitHub supports a Pages presentation layer; see its [Pages documentation](https://docs.github.com/en/pages). Course-site hosting settings and student Tiny Tapeout results-page settings need separate instructions.
 
+## Confirmed course decisions
+
+Recorded October 28, 2026:
+
+- Use SKY130 for every student project. Tiny Tapeout provides a current official SKY Verilog template. Its homepage also lists IHP and GF templates; this review establishes that SKY130 is supported, not that it is statistically the most common process.
+- Select tile allocations according to each project's area and routing needs rather than imposing `1x2`.
+- Require LibreLane, preinstalled in an Ubuntu VirtualBox image. Move image installation steps out of student directions and preserve them as staff preparation instructions.
+- Choose operating clocks per project using documented interface limits and timing results. The official [clock specification](https://tinytapeout.com/specs/clock/) describes an approximately 66 MHz SKY130 input-pad limit, and the [GPIO specification](https://tinytapeout.com/specs/gpio/) distinguishes pad limits from logic timing. This is not a universal operating frequency or a guarantee of timing closure. Remove the prior 100 MHz example as a default; 10 MHz/100 ns remains an illustrative conversion, not an imposed course frequency.
+- Submission arrangements are undecided. Preserve the original submission outline below as maintainer context; student directions stop at a submission-ready project.
+
+### Submission outline for later authoring
+
+Once arrangements are confirmed, use the [official submission guide](https://tinytapeout.com/guides/advanced-workshop/submit-your-design/) to document portal login, repository selection, the specific compatible SKY shuttle, coupon or payment handling if applicable, and submission and verification of the intended revision. New GitHub commits require a new portal revision to update the submitted design. Do not publish an actionable course submission sequence until these decisions are supplied.
+
 ## Decisions for the next work session
 
-- Confirm whether the source's Basys 3/Vivado and SKY130 assumptions are the intended course standard.
-- Choose the target shuttle, tile budget, operating clock requirements, and a template commit once that target is known.
+- Confirm the Basys 3/Vivado reference context and select a template commit.
+- Finalize the target SKY shuttle, submission timing, and coupon/payment arrangements when ready.
 - Supply or select a small reference RTL design and identify which existing student project will serve as the migration example.
-- Decide whether local LibreLane is required or an extension; identify supported student operating systems and available hardware.
+- Select the Ubuntu/LibreLane versions, host hardware requirements, image delivery method, VM login process, and tested checkout path. Build and validate the image; this documentation pass has not done so.
 - Set course deliverables and assessment criteria, public repository licensing, and whether a Pages reading interface is wanted.
 
 ## Current status

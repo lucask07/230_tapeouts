@@ -1,13 +1,13 @@
 # Run LibreLane locally
 
-Use LibreLane to turn synthesizable Verilog into a physical ASIC layout on your computer, then inspect that layout in KLayout. This companion lab explains installation, configuration, execution, and troubleshooting.
+In this required lab, you will use LibreLane in our preinstalled Ubuntu VirtualBox environment to turn synthesizable Verilog into a physical ASIC layout and inspect it in KLayout. We will use SKY130 for this course.
 
-It is based on the [original LibreLane Word instructions](../starting_references/LibreLane_Documentation.docx). For a Tiny Tapeout submission, start with the [Tiny Tapeout guide](tiny-tapeout.md). A general LibreLane configuration does not include all shuttle-specific requirements; use the official [Tiny Tapeout local hardening guide](https://tinytapeout.com/guides/local-hardening/) when building a submission locally.
+Complete the RTL adaptation and functional tests in the [Tiny Tapeout guide](tiny-tapeout.md) before implementing your own design locally. This lab uses a general LibreLane configuration to explore physical implementation. For a submission-compatible local build, follow the official [Tiny Tapeout local hardening guide](https://tinytapeout.com/guides/local-hardening/).
 
 ## Contents
 
-1. [Prepare Ubuntu](#1-prepare-ubuntu)
-2. [Install Nix and LibreLane](#2-install-nix-and-enter-the-librelane-environment)
+1. [Start the course virtual machine](#1-start-the-course-virtual-machine)
+2. [Check the LibreLane environment](#2-check-the-librelane-environment)
 3. [Collect project source files](#3-collect-the-project-source-files)
 4. [Create the configuration](#4-create-the-configuration-file)
 5. [Run implementation](#5-run-the-implementation-flow)
@@ -17,71 +17,33 @@ It is based on the [original LibreLane Word instructions](../starting_references
 
 ## Before you begin
 
-Have synthesizable RTL, its top-module name, a working functional test, and a known clock requirement. Decide whether this lab will run in an existing Linux environment or in an Ubuntu virtual machine (VM).
+Have your synthesizable RTL, top-module name, passing functional tests, and intended clock frequency ready. Use the preinstalled course VM for this lab; you do not need to install Ubuntu, Nix, or LibreLane yourself.
 
-The instructions below retain the Word document's Ubuntu-in-VirtualBox route. Official [Nix installation instructions](https://librelane.readthedocs.io/en/stable/installation/nix_installation/index.html) also cover Windows through WSL and macOS. Follow the route assigned for your course rather than combining installation methods.
+## 1. Start the course virtual machine
 
-## 1. Prepare Ubuntu
+1. Open VirtualBox and start the preinstalled Ubuntu course VM.
+2. Log in to Ubuntu and open **Terminal**.
+3. Run all commands in this lab inside Ubuntu, rather than in a terminal on the host computer.
 
-Skip this section if your instructor has provided a suitable Ubuntu environment.
+**Checkpoint:** Ubuntu starts and you can access your project files from Terminal.
 
-1. Install [Oracle VirtualBox](https://www.virtualbox.org/wiki/Downloads) if your computer supports the course's VM configuration.
-2. Download the Ubuntu ISO assigned by your instructor from [Ubuntu releases](https://releases.ubuntu.com/). Match the guest architecture to your supported host setup; an Intel/AMD image is not a universal choice for every computer.
-3. In VirtualBox, select **New** or **Create a new virtual machine**, depending on your version.
-4. Enter a VM name, choose a storage location, and select the ISO image.
-5. Configure your Ubuntu username and password if using unattended installation. Otherwise, enter them during the Ubuntu installer.
-6. Allocate CPU, memory, and disk resources that fit your host while leaving capacity for the host operating system. Use the course's tested allocation when available.
-7. Start the VM and complete Ubuntu setup. Open **Terminal** after logging in.
+## 2. Check the LibreLane environment
 
-The [official LibreLane Linux requirements](https://librelane.readthedocs.io/en/stable/installation/nix_installation/installation_linux.html) list 8 GiB of RAM as a minimum and 16 GiB as recommended, with a quad-core CPU as the minimum CPU guidance. A VM must fit within the host's resources, and large designs can require more. Allow storage for Ubuntu, tools, the process design kit, and multiple implementation runs.
-
-The original document's 25–31 GB memory allocation and six CPUs described one setup; they are not universal requirements. Ask your instructor for a supported environment if your computer cannot provide the needed resources.
-
-**Checkpoint:** Ubuntu starts reliably, Terminal works, and the environment has network access and available disk space.
-
-## 2. Install Nix and enter the LibreLane environment
-
-Run the following commands **in Ubuntu Terminal**, not in a Windows command prompt or on the host by accident. These steps follow LibreLane's [Ubuntu installation guide](https://librelane.readthedocs.io/en/stable/installation/nix_installation/installation_linux.html).
-
-### Install the prerequisite tools
+Enter the installed environment:
 
 ```bash
-sudo apt-get update
-sudo apt-get install -y curl git
-```
-
-### Install Nix
-
-For a new Nix installation, use the official guide's installer and cache configuration:
-
-```bash
-curl --proto '=https' --tlsv1.2 -fsSL https://artifacts.nixos.org/nix-installer | sh -s -- install --no-confirm --extra-conf "
-    extra-substituters = https://nix-cache.fossi-foundation.org
-    extra-trusted-public-keys = nix-cache.fossi-foundation.org:3+K59iFwXqKsL7BNu6Guy0v+uTlwsxYQxjspXzqLYQs=
-    extra-experimental-features = nix-command flakes
-"
-```
-
-Enter your Ubuntu password if prompted. When installation finishes, close Terminal and open a new Terminal window. If Nix is already installed, follow the official guide's existing-installation instructions to configure the cache and features.
-
-### Download LibreLane
-
-```bash
-git clone https://github.com/librelane/librelane.git ~/librelane
 cd ~/librelane
-git rev-parse HEAD
 nix-shell
 ```
 
-Record the commit printed by `git rev-parse HEAD`. If your instructor specifies a release or commit, check out that revision before entering `nix-shell`. If `~/librelane` already exists, inspect the existing checkout instead of cloning over it.
-
-The first environment setup downloads dependencies and may take some time. When it finishes, run:
+Record the tool revision and run the smoke test:
 
 ```bash
+git rev-parse HEAD
 librelane --smoke-test
 ```
 
-**Checkpoint:** The smoke test completes successfully. A changed shell prompt alone does not prove the installation works. Stop and diagnose installation errors before running your own design.
+**Checkpoint:** The smoke test completes successfully. If it fails, save the first actionable error and bring it to me before continuing. Keep the installed tool version unchanged so we can reproduce results across the class.
 
 ## 3. Collect the project source files
 
@@ -108,7 +70,7 @@ Create an empty file, then open it in your preferred text editor:
 touch ~/my_designs/final_proj/config.json
 ```
 
-Enter the following JSON, adapted from the Word document's configuration screenshot:
+Use this configuration structure and replace the filenames and settings with those for your design:
 
 ```json
 {
@@ -128,7 +90,7 @@ Enter the following JSON, adapted from the Word document's configuration screens
 }
 ```
 
-This is an example configuration for the source document's project, not a supplied working design. Replace the module name, source list, and clock settings with your own; remove filenames that are not part of your design and add any required dependencies.
+These filenames illustrate a multi-module project; the corresponding RTL is not included in this guide. Replace the module name, source list, and clock settings with your own; remove filenames that are not part of your design and add any required dependencies.
 
 The [LibreLane configuration reference](https://librelane.readthedocs.io/en/stable/reference/configuration.html) explains how design files are resolved. The [flow-variable reference](https://librelane.readthedocs.io/en/stable/reference/common_flow_vars.html) defines the clock settings.
 
@@ -139,9 +101,9 @@ The [LibreLane configuration reference](https://librelane.readthedocs.io/en/stab
 | `CLOCK_PORT` | Name of the top-level clock input |
 | `CLOCK_PERIOD` | Target period in nanoseconds |
 
-The example's 100 ns period corresponds to 10 MHz. A 100 MHz clock would have a 10 ns period. Choose the target from your design requirements and verify timing; changing a simulation unit does not establish physical timing closure.
+The example's 100 ns period corresponds to 10 MHz. Choose your project's target using the [clock-selection procedure](tiny-tapeout.md#choose-a-clock-and-tile-allocation), and use the corresponding period here. A simulation clock alone does not establish physical timing closure.
 
-JSON requires double-quoted keys and strings, commas between entries, and no trailing comma after the final entry. This example assumes the installed flow's default PDK and library settings. Record those resolved settings with your results; use the assigned configuration if your instructor specifies a different process or library.
+JSON requires double-quoted keys and strings, commas between entries, and no trailing comma after the final entry. Use the preinstalled environment's SKY130 (`sky130A`) process settings. Check the resolved PDK and standard-cell library in the run configuration and record them with your results.
 
 **Checkpoint:** The JSON is valid, each listed file exists, and the module and clock names match the RTL.
 
@@ -196,10 +158,10 @@ Record the tool revision, PDK/library, clock period, source revision, run direct
 | Layout viewer reports missing files | Confirm the selected run completed and produced the required layout outputs. |
 | Environment runs out of memory or disk | Check the host and guest resources and design size before changing the configuration or rerunning. |
 
-When asking for help, provide the first actionable error, the relevant configuration, and the recorded tool revision. Reinstalling the whole environment is usually unnecessary for an RTL or configuration error.
+When you ask me for help, provide the first actionable error, the relevant configuration, and the recorded tool revision. Reinstalling the whole environment is usually unnecessary for an RTL or configuration error.
 
-## Sources and validation status
+## Guide status
 
-Converted from the original course Word document, including its embedded configuration screenshot. Installation and command references were checked against the linked official LibreLane documentation on October 28, 2026. The environment has not been installed or the example run during this conversion; a tested course version and complete RTL example remain to be selected. See the [project review](project-plan.md#local-librelane-instructions) for the migration corrections.
+The commands and configuration have been reviewed against official documentation, but a complete course example has not yet been run through this guide.
 
 [← Tiny Tapeout guide](tiny-tapeout.md) · [Guide home](index.md)

@@ -12,4 +12,4 @@ The first Markdown edition of the course instructions is available. The guides h
 - [Project authoring skill](SKILL.md)
 - [Original references](starting_references/)
 
-The main guide uses GitHub Actions to build the chip design. The local LibreLane lab provides a companion route for learning physical implementation.
+All projects use SKY130. Students complete the GitHub Actions workflow and a required local LibreLane lab in a preinstalled Ubuntu VirtualBox environment. Tile allocation and clock frequency depend on the project. The current endpoint is a submission-ready design; fabrication arrangements remain undecided.

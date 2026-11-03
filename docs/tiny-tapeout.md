@@ -1,8 +1,8 @@
 # Prepare a Tiny Tapeout project
 
-This guide takes an existing Verilog FPGA design through the Tiny Tapeout repository workflow: adapt the RTL, connect the standard interface, test behavior, generate GDSII, and submit a specific revision.
+In this project, you will adapt your Verilog FPGA design for SKY130, connect the Tiny Tapeout interface, test its behavior, and generate GDSII. We will prepare the design for submission; fabrication submission arrangements are not yet finalized.
 
-It is based on the [original Tiny Tapeout Word instructions](../starting_references/TinyTapeout_Documentation.docx). The steps below use the [official SKY130 Verilog template](https://github.com/TinyTapeout/ttsky-verilog-template). Use the template for the shuttle assigned by your instructor if it differs.
+We will all use the [official SKY130 Verilog template](https://github.com/TinyTapeout/ttsky-verilog-template). You will also complete the required [local LibreLane lab](librelane.md) using our preinstalled Ubuntu VirtualBox environment.
 
 ## Contents
 
@@ -13,7 +13,7 @@ It is based on the [original Tiny Tapeout Word instructions](../starting_referen
 5. [Write design documentation](#5-write-the-design-documentation)
 6. [Adapt simulation tests](#6-adapt-the-simulation-tests)
 7. [Run workflows and inspect results](#7-run-the-workflows-and-inspect-the-results)
-8. [Submit a revision](#8-submit-the-intended-revision)
+8. [Prepare for submission](#8-prepare-for-submission)
 
 [Troubleshooting](#troubleshooting)
 
@@ -24,7 +24,7 @@ Have these items ready:
 - A GitHub account and the synthesizable Verilog source for your project.
 - The name of your current top module and a list of its ports.
 - A description of the required clock, reset polarity, and expected behavior.
-- Your instructor's target shuttle and tile budget.
+- Access to the preinstalled Ubuntu course VM for the local LibreLane lab.
 
 **Checkpoint:** You can explain what your project does and how to test it independently of the FPGA board.
 
@@ -101,7 +101,7 @@ Open `info.yaml` at the root of your chip repository. Keep its existing structur
 | `discord` | Your username, if you use it; this field is optional |
 | `language` | The hardware description language used |
 | `clock_hz` | Intended clock frequency in hertz; use the template's convention for a clockless design |
-| `tiles` | The supported allocation agreed with your instructor |
+| `tiles` | The supported allocation selected for your project's implementation needs |
 | `top_module` | The exact `tt_um_...` wrapper module name |
 | `source_files` | Each required RTL source filename, relative to `src/` |
 | `pinout` | Descriptive labels for the pins you use; leave unused labels blank and preserve the listed pins |
@@ -119,7 +119,15 @@ Replace the names with your actual files. Match the indentation of the surroundi
 
 ### Choose a clock and tile allocation
 
-The original FPGA board's oscillator does not automatically establish the ASIC's operating frequency. Choose the intended clock with your instructor and verify that the implemented design meets its timing requirements.
+Choose the operating clock from your project's functional requirements and verify it against implementation timing. We will not automatically carry over the Basys 3 board's 100 MHz clock.
+
+Tiny Tapeout's [clock specification](https://tinytapeout.com/specs/clock/) describes an external clock input and an approximately 66 MHz SKY130 input-pad rating. Its [GPIO guidance](https://tinytapeout.com/specs/gpio/) distinguishes that limit from the maximum frequency of the logic inside your design. The pad rating is not a guarantee that your design meets timing at that frequency.
+
+1. Identify the frequency needed by your design, including any clock-dependent counters, display timing, or serial interfaces.
+2. Select a target within the documented SKY130 input limits and supported by your clock source. Do not use 100 MHz as the default target for this course.
+3. Enter the intended operating frequency in `clock_hz`. Check the actual implementation constraints separately; do not assume that metadata alone configures every timing constraint.
+4. Use the corresponding clock period in your simulation and local LibreLane configuration. Verify timing for the intended frequency and relevant process, voltage, and temperature conditions.
+5. If timing fails, revise the design or lower its operating frequency and update any logic that depends on real-time intervals. Repeat the checks at the revised target.
 
 The clock-period conversion is:
 
@@ -127,9 +135,9 @@ The clock-period conversion is:
 period in nanoseconds = 1,000,000,000 / frequency in hertz
 ```
 
-For example, 100 MHz corresponds to 10 ns. This is a unit conversion, not a recommendation to run every project at 100 MHz. Check the selected template's generated implementation constraints against your target; do not create or edit an assumed `config.json` merely because an older instruction mentions one.
+For example, 10 MHz corresponds to 100 ns, and 50 MHz corresponds to 20 ns. These are conversion examples, not required operating frequencies. Preserve the template's supported timing-constraint mechanism; the configuration used for the local LibreLane lab is a separate file.
 
-Similarly, `1x2` means two tiles, but it is not the right allocation for every project. Use the target shuttle's limits and implementation reports to assess fit.
+Select a supported tile allocation based on your project's area and routing needs. Start with the smallest allocation that appears suitable, then check utilization, routing, and timing results. Increase the allocation if the design cannot fit and route successfully. Record why you selected it; we will not use a fixed `1x2` allocation for every project.
 
 **Checkpoint:** Module names, filenames, clock requirements, tile allocation, and pin labels agree with the design.
 
@@ -156,7 +164,7 @@ The template uses a Verilog harness in `test/tb.v` and a Python test in `test/te
    ```
 
 2. Keep `TOPLEVEL = tb` when using the template harness. In `test/tb.v`, replace the example design's module name with your wrapper module name. Preserve the harness connections and gate-level power-port conditionals.
-3. In `test/test.py`, choose a simulation clock period and units appropriate to the design. In the reviewed template, a 10 ns period is written as `Clock(dut.clk, 10, unit="ns")`; use the syntax supported by your template's cocotb version.
+3. In `test/test.py`, use the simulation period selected for your design. For example, a 10 MHz clock has a 100 ns period, written as `Clock(dut.clk, 100, unit="ns")` in the current template's cocotb syntax.
 4. Set `ena` and all testbench-driven inputs to known values. Assert `rst_n = 0`, hold reset for the duration required by your design, and release it with `rst_n = 1`.
 5. Replace the template's sample stimulus and expected sum with tests for your own hardware. Check reset behavior, representative operations, and boundary cases. If a result takes multiple cycles, wait for the required latency and sample after the signals settle.
 6. Add assertions that compare actual outputs with expected outputs. Merely waiting 100 cycles does not establish correct behavior.
@@ -176,32 +184,34 @@ Workflow names and job structure can change. The current [SKY GDS workflow](http
 | Precheck and physical checks | The selected flow's required checks pass; investigate reported violations. |
 | Gate-level tests | The implemented netlist passes the applicable behavioral tests. |
 | Documentation | The generated design documentation builds and describes your project correctly. |
-| FPGA workflow, if used | Any separate FPGA demonstration required for your course works. |
+| FPGA workflow | This checks a separate FPGA build; it does not replace ASIC implementation and verification. |
 
 A queued or running job has not passed yet. If a run fails, open the failed job, find the first actionable error, fix the corresponding file, and commit the correction. Use **Run workflow** only when that workflow provides the manual-run option; otherwise trigger it according to its configuration.
 
 After implementation succeeds:
 
 1. Read the run summary and the available area, utilization, and timing reports.
-2. Confirm that the reported clock constraints match your intended operating conditions. Review violations with your instructor rather than accepting the presence of a GDS file as sufficient evidence.
+2. Confirm that the reported clock constraints match your intended operating conditions. Resolve reported violations and bring questions about the reports to me. The presence of a GDS file alone is not sufficient evidence of a successful implementation.
 3. Open the generated viewer to inspect the layout. Download the run's artifacts if you need the GDSII or detailed reports; artifact names and paths depend on the flow version.
 4. Record the commit and workflow run URL for your successful build.
 
 **Checkpoint:** You can connect the tested source revision to its generated layout and explain the status of its required checks.
 
-## 8. Submit the intended revision
+## 8. Prepare for submission
 
-Follow the current [official submission guide](https://tinytapeout.com/guides/advanced-workshop/submit-your-design/) and your instructor's course requirements.
+Stop at a submission-ready project for now. Our fabrication submission arrangements have not yet been finalized; do not place an order or submit a fabrication revision as part of these steps.
 
-1. Sign in to the [Tiny Tapeout submission portal](https://app.tinytapeout.com/projects/create) with GitHub.
-2. Create a project using your chip repository URL and select the assigned shuttle. For this guide's SKY template, use the compatible SKY shuttle specified by your instructor.
-3. Apply an instructor-provided coupon if applicable. Keep the coupon value out of your public repository. Confirm any order details with your instructor before purchasing fabrication or hardware.
-4. Complete the project submission steps, then use **Submit a new revision** to submit the intended version.
-5. Check the portal status and confirm that the submitted revision matches the successful build you recorded.
+Prepare these items:
 
-If you change the design, rerun the required checks and submit a new revision before the shuttle closes. A GitHub commit alone does not update the submitted revision.
+- Your public chip repository URL and intended commit.
+- Passing functional tests, implementation checks, and generated documentation for that commit.
+- The GDS workflow run URL, layout artifacts, and required reports.
+- Your chosen tile allocation, operating frequency, and pin map.
+- A reproducible procedure for testing the manufactured design.
 
-**Checkpoint:** The portal confirms the intended revision, and you have recorded the project and revision details.
+The [official submission guide](https://tinytapeout.com/guides/advanced-workshop/submit-your-design/) explains how the portal submits a specific revision. Read it to understand the later process; a successful GitHub build does not itself submit the design for fabrication.
+
+**Checkpoint:** Your project is ready for review and you can identify the exact source revision associated with its verified layout.
 
 ## Troubleshooting
 
@@ -215,8 +225,8 @@ If you change the design, rerun the required checks and submit a new revision be
 | Layout or timing fails | Read the failing implementation report; review area, clock requirements, routing, and unsupported RTL dependencies. |
 | Workflow has not started | Check that Actions is enabled, the changes reached GitHub, and the workflow supports the event you used. |
 
-## Sources and validation status
+## Guide status
 
-Converted from the original course Word document and checked against the linked official template and guides on October 28, 2026. The substantive corrections are recorded in the [project review](project-plan.md#tiny-tapeout-instructions). A template commit, worked student example, and complete build validation remain to be recorded before a course release.
+The instructions have been reviewed against the linked official documentation. A complete course example has not yet been run through this guide.
 
-[← Guide home](index.md) · [Local LibreLane companion lab →](librelane.md)
+[← Guide home](index.md) · [Required local LibreLane lab →](librelane.md)
