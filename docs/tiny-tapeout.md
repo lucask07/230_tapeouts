@@ -1,6 +1,6 @@
 # Prepare a Tiny Tapeout project
 
-In this project, you will adapt your Verilog FPGA design for SKY130, connect the Tiny Tapeout interface, test its behavior, and generate GDSII. We will prepare the design for submission; fabrication submission arrangements are not yet finalized.
+In this project, you will adapt your Verilog FPGA final project for a custom CMOS integrated circuit (targeting SkyWater 130 nm), connect the Tiny Tapeout interface, test its behavior, and generate GDSII (the files that are sent out for fabrication). 
 
 We will all use the [official SKY130 Verilog template](https://github.com/TinyTapeout/ttsky-verilog-template). You will also complete the required [local LibreLane lab](librelane.md) using our preinstalled Ubuntu VirtualBox environment.
 
@@ -21,37 +21,33 @@ We will all use the [official SKY130 Verilog template](https://github.com/TinyTa
 
 Have these items ready:
 
-- A GitHub account and the synthesizable Verilog source for your project.
-- The name of your current top module and a list of its ports.
+- A GitHub account and the synthesizable Verilog source for your final project.
+- The name of your current top module and a list of its ports. The ports are the inputs and outputs that go to the BASYS board. 
 - A description of the required clock, reset polarity, and expected behavior.
-- Access to the preinstalled Ubuntu course VM for the local LibreLane lab.
-
-**Checkpoint:** You can explain what your project does and how to test it independently of the FPGA board.
+- The preinstalled Ubuntu Virtual Machine (VM) for the local LibreLane lab.
 
 ## 1. Identify the RTL you will reuse
 
-1. Open your Vivado project and identify the top module and every module it instantiates. Source files are often in the project's `sources_1` hierarchy; use Vivado's hierarchy view to confirm which files are actually used.
+1. Open your Vivado project and identify the top module and every module it instantiates. Source files are often in the project's `projectname.srcs/sources_1/new` folder; use the Vivado source explorer to confirm which files are actually used by your design.
 2. Collect those RTL files and any included headers or required data files. Keep simulation-only testbenches separate from synthesizable source.
-3. Identify FPGA-specific components such as clock-generation IP, block-memory IP, or device primitives. Replace or adapt them for the ASIC flow before building.
+3. Identify FPGA-specific components such as clock-generation IP, block-memory IP, or device primitives. It is unlikely that your design has these. Replace or adapt them for the ASIC flow before building.
 4. Separate the reusable design from board-specific connections. A Basys 3 constraints file describes FPGA package pins; it does not define the Tiny Tapeout pin mapping.
 5. Check that sequential logic has a defined reset behavior. Review assumptions about initialized registers and memories using Tiny Tapeout's [FPGA-to-ASIC notes](https://tinytapeout.com/hdl/fpga_vs_asic/).
 
-**Checkpoint:** You have a source-file list, a known top module, and a list of any dependencies that still need adaptation.
-
-## 2. Create your chip repository
+## 2. Create your chip GitHub repository
 
 1. Open the [SKY130 Verilog template](https://github.com/TinyTapeout/ttsky-verilog-template).
 2. Select **Use this template → Create a new repository**.
-3. Select your account as the owner, choose a descriptive repository name, and write a short project description.
+3. Select your GitHub account as the owner, choose a descriptive repository name, and write a short project description.
 4. Select **Public**, then create the repository.
 5. In your new repository, open **Settings → Pages**. Under **Build and deployment**, set **Source** to **GitHub Actions**, following the template's [Pages setup instructions](https://tinytapeout.com/faq/#my-github-action-is-failing-on-the-pages-part).
 6. Open **Actions** and enable workflows if GitHub asks you to do so.
 
-Work in this new chip repository for the remaining steps. This course guide repository is separate from your submission repository.
+Work in this new chip repository for the remaining steps. Note that GitHub repository used for these instructions is of course separate from your submission repository.
 
 The Pages setting above supports the template's results viewer. It does not publish this course guide.
 
-**Checkpoint:** Your repository has `src/`, `test/`, `docs/`, `info.yaml`, and the template workflows. Record the template revision used for your project in your project notes.
+**Checkpoint:** Your repository has `src/`, `test/`, `docs/`, `info.yaml`, and the template workflows. Record information about the template revision, such as the Git commit SHA, used for your project in your project notes.
 
 ## 3. Connect your design to the Tiny Tapeout interface
 
@@ -70,7 +66,7 @@ The current [template wrapper](https://github.com/TinyTapeout/ttsky-verilog-temp
 | `rst_n` | Input | Active-low reset |
 | `ena` | Input | Design enable supplied by the Tiny Tapeout infrastructure |
 
-1. Give the wrapper a unique module name beginning with `tt_um_`, such as `tt_um_yourusername_project`. Rename the file if useful, and use the same module name throughout the project.
+1. Give the wrapper a unique module name beginning with `tt_um_`, such as `tt_um_yourusername_project`. Rename the file if useful, and use the same module name throughout the project. (tt: tiny tapeout and um: user module)
 2. Instantiate your reusable core inside the wrapper. Connect the core's ports to the Tiny Tapeout signals by name.
 3. Write a pin mapping table in your design documentation so the bit assignments are clear.
 4. Match the reset polarity. If the core's `reset` input is active high, connect `.reset(!rst_n)`. If its reset is active low, connect `rst_n` directly to that port. Check the core's implementation before choosing.
@@ -124,20 +120,20 @@ Choose the operating clock from your project's functional requirements and verif
 Tiny Tapeout's [clock specification](https://tinytapeout.com/specs/clock/) describes an external clock input and an approximately 66 MHz SKY130 input-pad rating. Its [GPIO guidance](https://tinytapeout.com/specs/gpio/) distinguishes that limit from the maximum frequency of the logic inside your design. The pad rating is not a guarantee that your design meets timing at that frequency.
 
 1. Identify the frequency needed by your design, including any clock-dependent counters, display timing, or serial interfaces.
-2. Select a target within the documented SKY130 input limits and supported by your clock source. Do not use 100 MHz as the default target for this course.
-3. Enter the intended operating frequency in `clock_hz`. Check the actual implementation constraints separately; do not assume that metadata alone configures every timing constraint.
-4. Use the corresponding clock period in your simulation and local LibreLane configuration. Verify timing for the intended frequency and relevant process, voltage, and temperature conditions.
+2. Select a target within the documented SKY130 input limits and supported by your clock source. Do not automatically use the 100 MHz from the Basys 3 board as the default target frequency for your tapeout.
+3. Enter the intended operating frequency in `clock_hz`. Check that this clock frequency is found in the actual implementation constraints.
+4. Use the corresponding clock period in your simulation(s) and local LibreLane configuration. Verify timing for the intended frequency and relevant process, voltage, and temperature conditions.
 5. If timing fails, revise the design or lower its operating frequency and update any logic that depends on real-time intervals. Repeat the checks at the revised target.
 
-The clock-period conversion is:
+Recall that the clock-period conversion is:
 
 ```text
-period in nanoseconds = 1,000,000,000 / frequency in hertz
+period in nanoseconds = 1,000 / frequency in MegaHertz (MHz)
 ```
 
 For example, 10 MHz corresponds to 100 ns, and 50 MHz corresponds to 20 ns. These are conversion examples, not required operating frequencies. Preserve the template's supported timing-constraint mechanism; the configuration used for the local LibreLane lab is a separate file.
 
-Select a supported tile allocation based on your project's area and routing needs. Start with the smallest allocation that appears suitable, then check utilization, routing, and timing results. Increase the allocation if the design cannot fit and route successfully. Record why you selected it; we will not use a fixed `1x2` allocation for every project.
+Select the tile allocation based on your project's area and routing needs. Start with the smallest allocation that appears suitable, then check utilization, routing, and timing results. Increase the allocation if the design cannot fit and route successfully. If your design exceeds `1x1` please check with Lucas. Record why you selected your allocation and what subcircuits drove the area consumption. 
 
 **Checkpoint:** Module names, filenames, clock requirements, tile allocation, and pin labels agree with the design.
 
@@ -145,13 +141,13 @@ Select a supported tile allocation based on your project's area and routing need
 
 Open `docs/info.md` **in your chip repository** and complete its existing sections:
 
-- **How it works:** Explain the design's purpose, main modules, and input/output behavior. Include the pin map and relevant clock and reset assumptions.
-- **How to test:** Give a human operator a sequence of input changes and expected outputs. Explain how to reset the design, start it, and recognize correct operation.
+- **How it works:** Explain the design's purpose, main modules, and input/output behavior. Include the pin map and relevant clock and reset assumptions. This chip will not be back for testing for at least 6 months, likely longer. You need good documentation so your future self can test it! 
+- **How to test:** Develop a sequence of input signals and expected outputs. Explain how to reset the design, start it, and recognize correct operation.
 - **External hardware:** List required equipment, switches, displays, or Pmods and explain their connections.
 
-Use signal names and pin numbers that match your wrapper. Replace references to FPGA-board buttons or LEDs with the actual external connections needed to use the manufactured chip.
+Use signal names and pin numbers that match your wrapper. Replace all references to the FPGA Basys 3 board buttons or LEDs with the actual external connections needed to use the Tiny Tapeout chip.
 
-**Checkpoint:** A classmate could describe how to operate your chip using the documentation and pin map.
+**Checkpoint:** A classmate should be able to describe how to operate your chip using the documentation and pin map.
 
 ## 6. Adapt the simulation tests
 
@@ -199,7 +195,7 @@ After implementation succeeds:
 
 ## 8. Prepare for submission
 
-Stop at a submission-ready project for now. Our fabrication submission arrangements have not yet been finalized; do not place an order or submit a fabrication revision as part of these steps.
+Stop at a submission-ready project for now. The fabrication submission arrangements for ENGR 230 have not yet been finalized; do not place an order or submit a fabrication revision as part of these steps.
 
 Prepare these items:
 
