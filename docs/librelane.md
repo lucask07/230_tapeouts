@@ -100,17 +100,20 @@ Here's an example,
     "dir::full_adder.v"
     ],
   "CLOCK_PERIOD": 100,
-  "CLOCK_PORT": "clk"
+  "CLOCK_PORT": "clk",
+  "DIE_AREA": "0 0 120 120",
+  "CORE_AREA": "20 20 100 100",
+  "FP_CORE_UTIL:" 30
 }
 ```
 
-These filenames illustrate a multi-module project; the corresponding RTL is not included in this guide. Replace the module name, source list, and clock settings with your own; remove filenames that are not part of your design and add any required dependencies.
+These filenames illustrate an example four bit adder circuit. Replace the module name, source list, and clock settings with your own; remove filenames that are not part of your design and add any required dependencies. Because a four bit adder is so small we have to force the area to be a bit larger so that the metal ties are big enough to pass design rule checking (DRC). This explains the settings of DIE_AREA, CORE_AREA, and FP_CORE_UTIL. Also, not that the four bit adder does not actually have a clock so the CLOCK_PORT configuration will be ignored. 
 
 The [LibreLane configuration reference](https://librelane.readthedocs.io/en/stable/reference/configuration.html) explains how design files are resolved. The [flow-variable reference](https://librelane.readthedocs.io/en/stable/reference/common_flow_vars.html) defines the clock settings.
 
 | Setting | Meaning |
 | --- | --- |
-| `DESIGN_NAME` | Exact name of the RTL top module, including capitalization |
+| `DESIGN_NAME` | Exact name of the RTL **top** module, including capitalization |
 | `VERILOG_FILES` | Source-file list; `dir::` resolves a path relative to this configuration's directory |
 | `CLOCK_PORT` | Name of the top-level clock input |
 | `CLOCK_PERIOD` | Target period in nanoseconds |
@@ -159,12 +162,12 @@ KLayout should open with the generated layout. If the most recent run failed, `-
 
 ## 7. Review the output reports 
 
-In the directory 'runs/' 
+Navigate to the directory 'runs/' and then the most recent run (the folders are labeled by the date and time). 
 
 1. Area and gate count in final/metrics.csv. Find and record cell count, gate count, and area.
-2. Timing closure in *-openroad-stapostpnr/summary.rpt. STA stands for static timing analysis. PNR stands for place and route. Report worst case setup and hold slack. A negative slack means that setup time or hold time failed.
-3. Some reports are over *corners*. In CMOS design, what does this mean?
-4. Review the sign off steps discussed in the [librelane documenation](https://librelane.readthedocs.io/en/stable/getting_started/newcomers/index.html#signoff-steps). Define DRC 
+2. Timing closure in 55-openroad-stapostpnr/summary.rpt (the number should be 55 but it might not be!). STA stands for static timing analysis. PNR stands for place and route. Report worst case setup and hold slack. A negative slack means that setup time or hold time failed. Why does this design not have relevant setup and hold time analysis?
+3. Some reports are over *corners*. Review the librelane documentation to know what this means [corners](https://librelane.readthedocs.io/en/stable/usage/timing_corners.html). What is the 'tt' corner? What is the 'ff' corner? 
+
 
 ## Troubleshooting
 

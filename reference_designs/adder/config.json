@@ -1,0 +1,14 @@
+{
+	"DESIGN_NAME": "four_bit_adder",
+	"VERILOG_FILES": [
+		"dir::four_bit_adder.v",
+		"dir::full_adder.v"
+	],
+	"CLOCK_PERIOD": 100,
+	"CLOCK_PORT": "clk",
+	"DIE_AREA": "0 0 120 120",
+	"CORE_AREA": "20 20 100 100",
+	"FP_CORE_UTIL": 30
+
+}
+
