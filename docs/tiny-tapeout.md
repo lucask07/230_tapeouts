@@ -43,9 +43,7 @@ Have these items ready:
 5. In your new repository, open **Settings → Pages**. Under **Build and deployment**, set **Source** to **GitHub Actions**, following the template's [Pages setup instructions](https://tinytapeout.com/faq/#my-github-action-is-failing-on-the-pages-part).
 6. Open **Actions** and enable workflows if GitHub asks you to do so.
 
-Work in this new chip repository for the remaining steps. Note that GitHub repository used for these instructions is of course separate from your submission repository.
-
-The Pages setting above supports the template's results viewer. It does not publish this course guide.
+Work in this new chip repository for the remaining steps. Note that the GitHub repository used for these instructions is of course separate from your Tiny Tapeout submission GitHub repository.
 
 **Checkpoint:** Your repository has `src/`, `test/`, `docs/`, `info.yaml`, and the template workflows. Record information about the template revision, such as the Git commit SHA, used for your project in your project notes.
 

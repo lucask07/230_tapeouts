@@ -4,9 +4,9 @@ Maintainer instructions retained from the initial Word-to-Markdown conversion. T
 
 ## 1. Prepare Ubuntu
 
-Prepare the Ubuntu VirtualBox image before distributing it to students. This page is for course staff; students start with the preinstalled image described in the [local lab](librelane.md).
+Steps to prepare the Ubuntu VirtualBox image. This page is for course staff; students start with the preinstalled image described in the [local lab](librelane.md).
 
-1. Install [Oracle VirtualBox](https://www.virtualbox.org/wiki/Downloads) if your computer supports the course's VM configuration.
+1. We will use [Oracle VirtualBox](https://www.virtualbox.org/wiki/Downloads). This should be installed on the school machines.
 2. Download the Ubuntu ISO selected for the course image from [Ubuntu releases](https://releases.ubuntu.com/). Match the guest architecture to your supported host setup; an Intel/AMD image is not a universal choice for every computer.
 3. In VirtualBox, select **New** or **Create a new virtual machine**, depending on your version.
 4. Enter a VM name, choose a storage location, and select the ISO image.
@@ -17,8 +17,6 @@ Prepare the Ubuntu VirtualBox image before distributing it to students. This pag
 The [official LibreLane Linux requirements](https://librelane.readthedocs.io/en/stable/installation/nix_installation/installation_linux.html) list 8 GiB of RAM as a minimum and 16 GiB as recommended, with a quad-core CPU as the minimum CPU guidance. A VM must fit within the host's resources, and large designs can require more. Allow storage for Ubuntu, tools, the process design kit, and multiple implementation runs.
 
 The original document's 25–31 GB memory allocation and six CPUs described one setup; they are not universal requirements. Document a supported host configuration before distributing the image.
-
-**Checkpoint:** Ubuntu starts reliably, Terminal works, and the environment has network access and available disk space.
 
 ## 2. Install Nix and enter the LibreLane environment
 

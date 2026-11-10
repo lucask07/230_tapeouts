@@ -19,6 +19,20 @@ Complete the RTL adaptation and functional tests in the [Tiny Tapeout guide](tin
 
 Have your synthesizable RTL, top-module name, passing functional tests, and intended clock frequency ready. Use the preinstalled course VM for this lab; you do not need to install Ubuntu, Nix, or LibreLane yourself.
 
+## 0. Create a New Virtual Machine using the supplied VDI disk
+
+1. Download the Ubuntu.vdi and place it in a local folder (not in OneDrive!)
+2. Start 'Oracle VirtualBox Manager' 
+3. Select 'Expert Mode' 
+4. New Virtual Machine
+5. 'Specify Virtual Hard Disk' -> Ubuntu.vdi (downloaded from OneDrive link on Canvas)
+6. 'Specify virtual hardware'
+  - base memory ~ 24,000 MB
+  - Number of CPUs ~ 16 
+7. Power-up/boot Ubuntu
+8. Login: The username is vboxuser and the password is a single space. 
+
+
 ## 1. Start the course virtual machine
 
 1. Open VirtualBox and start the preinstalled Ubuntu course VM.
@@ -29,11 +43,15 @@ Have your synthesizable RTL, top-module name, passing functional tests, and inte
 
 ## 2. Check the LibreLane environment
 
-Enter the installed environment:
+Enter the the librelane directory in a terminal, it is possible the terminal will start in this directory so `cd` may not be necessary:
 
 ```bash
 cd ~/librelane
 nix-shell
+```
+There may be an error stating that 'nixpkgs' was not found, this is OK as long as your prompt now has:
+```bash
+[nix-shell:~/librelane]$
 ```
 
 Record the tool revision and run the smoke test:
@@ -42,8 +60,9 @@ Record the tool revision and run the smoke test:
 git rev-parse HEAD
 librelane --smoke-test
 ```
+The smoke test will take about 2 minutes. Watch the text as it proceeds, we hope to learn some of the terminology. 
 
-**Checkpoint:** The smoke test completes successfully. If it fails, save the first actionable error and bring it to me before continuing. Keep the installed tool version unchanged so we can reproduce results across the class.
+**Checkpoint:** The smoke test completes successfully. If it fails, save the errors and email me (Lucas and Prof. Tran) before continuing. Keep the installed tool version unchanged so we can reproduce the error.
 
 ## 3. Collect the project source files
 
@@ -55,7 +74,7 @@ mkdir -p ~/my_designs/final_proj
 
 1. Copy the reusable RTL from your Vivado project into this directory. Use the design hierarchy to collect all required modules and headers.
 2. Exclude simulation-only testbenches and FPGA-generated implementation files.
-3. Resolve vendor-specific primitives, IP, or memory assumptions before implementation.
+3. Resolve vendor-specific primitives, IP, or memory assumptions before implementation. It is unlikely that you have any of these. 
 4. Check the exact top-module name and clock-port name in the RTL.
 
 Use simple directory and filenames such as `final_proj` and `top_module.v` to keep the commands easy to follow. In these commands, `~` means your Ubuntu home directory.
@@ -136,19 +155,16 @@ After a successful run, open its layout using the command from the [official new
 librelane --last-run --flow openinklayout ~/my_designs/final_proj/config.json
 ```
 
-KLayout should open with the generated layout. If the most recent run failed, `--last-run` may select that incomplete run; resolve the failure before using this shortcut.
+KLayout should open with the generated layout. If the most recent run failed, `--last-run` may select that incomplete run; resolve the failure before using this shortcut. Browse the layout and find three examples of CMOS gates that we have discussed in class. Capture screenshots that to submit. 
 
-Locate the run's `final/` outputs and review its reports. Check timing, physical design rules (DRC), and layout-versus-schematic connectivity (LVS), along with other checks required by the flow. Viewing a layout confirms that you can inspect the geometry; it does not establish that all checks passed.
+Locate the run's `final/` outputs and review its reports. Check timing, physical design rules (DRC), and layout-versus-schematic connectivity (LVS), along with other checks required by the flow. 
 
-Record the tool revision, PDK/library, clock period, source revision, run directory, and check results. These details make size and timing comparisons meaningful.
-
-**Checkpoint:** You can show the layout and explain which implementation checks passed or still need attention.
+**Checkpoint:** You can show the layout and explain which implementation checks passed or have issues.
 
 ## Troubleshooting
 
 | Symptom | What to check |
 | --- | --- |
-| `nix-shell` fails with `nixpkgs` not found | Check the Nix installation and the LibreLane revision's setup instructions. Do not assume this error is harmless because a shell prompt appears. |
 | `librelane` command not found | Enter the LibreLane Nix environment and rerun the smoke test. |
 | Configuration file cannot be parsed | Check commas, double quotes, brackets, and the reported JSON line and column. |
 | Top module cannot be found | Compare `DESIGN_NAME` with the module declaration and check that its file is listed. |
@@ -158,10 +174,13 @@ Record the tool revision, PDK/library, clock period, source revision, run direct
 | Layout viewer reports missing files | Confirm the selected run completed and produced the required layout outputs. |
 | Environment runs out of memory or disk | Check the host and guest resources and design size before changing the configuration or rerunning. |
 
-When you ask me for help, provide the first actionable error, the relevant configuration, and the recorded tool revision. Reinstalling the whole environment is usually unnecessary for an RTL or configuration error.
+When you ask for help, provide the errors and the relevant configuration. Reinstalling the whole environment is almost always unnecessary when faced with an error.
 
-## Guide status
+## Questions / TODO 
 
-The commands and configuration have been reviewed against official documentation, but a complete course example has not yet been run through this guide.
+1. How to summarize the data in runs/ , determine some of the key output files for students to inspect 
+2. Need a much simpler design (4 bit counter), or adder 
+3. Figure out how to simulate the extracted spice file 
+4. With a simpler design locate some devices in the layout 
 
 [← Tiny Tapeout guide](tiny-tapeout.md) · [Guide home](index.md)
