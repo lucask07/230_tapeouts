@@ -149,7 +149,7 @@ If the run fails, carefully read the errors and its log, correct the underlying 
 After a successful run, open the layout using the command from the [official newcomers' tutorial](https://librelane.readthedocs.io/en/stable/getting_started/newcomers/index.html):
 
 ```bash
-librelane --last-run --flow openinklayout ~/my_designs/final_proj/config.json
+librelane --last-run --flow openinklayout ~/my_designs/adder/config.json
 ```
 
 KLayout should open with the generated layout. If the most recent run failed, `--last-run` may select that incomplete run; resolve the failure before using this shortcut. Next, complete the items below as part of your "report" for this lab that you will submit to Canvas. 
