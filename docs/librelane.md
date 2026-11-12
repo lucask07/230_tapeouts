@@ -102,7 +102,7 @@ Here's an example,
   "CLOCK_PORT": "clk",
   "DIE_AREA": "0 0 120 120",
   "CORE_AREA": "20 20 100 100",
-  "FP_CORE_UTIL:" 30
+  "FP_CORE_UTIL": 30
 }
 ```
 
