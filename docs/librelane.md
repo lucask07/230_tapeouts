@@ -1,6 +1,6 @@
 # Run LibreLane locally
 
-In this tapeout lab, you will use LibreLane in our preinstalled Ubuntu VirtualBox environment to turn synthesizable four-bit adder Verilog into a physical ASIC layout and inspect it in KLayout. We will use [SKY130](https://skywater-pdk.readthedocs.io/en/main/index.html) for this course.
+In this tapeout lab, you will use LibreLane in our preinstalled Ubuntu VirtualBox environment to turn synthesizable four-bit adder Verilog into a physical ASIC layout and inspect it in KLayout. We will use [SKY130](https://skywater-pdk.readthedocs.io/en/main/index.html) for this course. These instructions are designed to **help** you get to a tapeout for your final project but are **not a step-by-step guide.** You need to understand the process so that you can debug if problems arise. 
 
 Complete section 1 "1. Identify the RTL you will reuse" from [Tiny Tapeout guide](tiny-tapeout.md) before implementing your own design locally. This lab uses a general LibreLane configuration to explore physical implementation. 
 
@@ -25,15 +25,18 @@ Gather the resulable files from a Verilog project (.v design files) that you wou
 2. Start 'Oracle VirtualBox Manager' 
 3. Select 'Expert Mode' 
 4. New Virtual Machine
-5. 'Specify Virtual Hard Disk' -> Ubuntu.vdi (downloaded from the OneDrive link on Canvas)
-6. 'Specify virtual hardware'
+5. From the dropdown pick the OS as 'Linux'
+6. 'Specify Virtual Hard Disk' -> Add Ubuntu.vdi (downloaded from the OneDrive link on Canvas)
+7. 'Specify virtual hardware' (these numbers are approximate)
   - base memory ~ 24,000 MB
   - Number of CPUs ~ 16 
-7. Power-up/boot Ubuntu
-8. Login: The username is vboxuser and the password is a single space. 
+8. Ensure that UEFI is not checked (disabled)
+9. Power-up/start/boot Ubuntu
+10. Login: The username is vboxuser and the password is a single space. 
 
+![OS selection](figures/os_vbox.png)
 
-## 1. Start the course virtual machine
+## 1. Start the virtual machine
 
 1. Open VirtualBox and start the preinstalled Ubuntu course VM.
 2. Log in to Ubuntu and open **Terminal**.
@@ -78,7 +81,7 @@ mkdir -p ~/my_designs/adder
 3. Resolve vendor-specific primitives, IP, or memory assumptions before implementation. It is unlikely that you have any of these. 
 4. Check the exact top-module name and clock-port name in the RTL.
 
-Use simple directory and filenames such as `adder` and `four_bit_adder.v` to keep the commands easy to follow. In these commands, `~` means your Ubuntu home directory.
+Use simple directory and filenames such as `adder` and `four_bit_adder.v` to keep the commands easy to follow. In these commands, `~` is a shortcut for your Ubuntu home directory.
 
 ## 4. Create the librelane configuration file
 
@@ -105,6 +108,7 @@ Here's an example,
   "FP_CORE_UTIL": 30
 }
 ```
+this example is on the GitHub repository in the folder *reference_designs* [adder config](https://github.com/lucask07/230_tapeouts/blob/main/reference_designs/adder/config.json)
 
 These filenames illustrate an example four bit adder circuit. Replace the module name, source list, and clock settings with your own; remove filenames that are not part of your design and add any required dependencies. Because a four bit adder is so small we have to force the area to be a bit larger so that the metal ties are big enough to pass design rule checking (DRC). This explains the settings of DIE_AREA, CORE_AREA, and FP_CORE_UTIL; these should be removed with larger more complex designs like your final project. Also, note that the four bit adder does not actually have a clock so the CLOCK_PORT configuration will be ignored and/or a warning will be issued. 
 
