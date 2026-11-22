@@ -86,6 +86,20 @@ The MicroPython board needs the Tiny Tapeout firmware and FPGA breakout support 
 
 ## Installation record and validation
 
+### Missing apycula dependencies
+
+If setup reports that `apycula` requires `fastcrc` and `msgspec`, install them in the suite's Python environment. The suite environment exists even if setup stopped before creating `activate.sh`.
+
+```bash
+source ~/tiny-tapeout-fpga/oss-cad-suite/environment
+python3 -m pip install fastcrc msgspec
+python3 -m pip check
+```
+
+Adjust the path if you used another installation destination. Then open a fresh Ubuntu Terminal and rerun the setup script to finish the launcher, tool checks, and `dialout` setup. The updated installer includes these dependencies in its installation command. The upstream OSS CAD Suite project also documents installing missing Apicula dependencies into the suite environment. [Upstream dependency discussion](https://github.com/YosysHQ/oss-cad-suite-build/issues/194)
+
+### Version record
+
 Sources were reviewed on November 21, 2026. The supplied history is retained alongside the installer. The release date follows that history, and the initial Tiny Tapeout checkout follows the upstream default branch. Use the generated revision record when preparing the class VM image.
 
 The installer has been checked with Bash syntax validation and a mocked installation workflow. A complete Ubuntu installation, FPGA build, and physical USB upload still need to be validated on the course VM and board.

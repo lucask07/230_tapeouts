@@ -153,7 +153,9 @@ if not pathlib.Path(sys.prefix).resolve().is_relative_to(suite):
     raise SystemExit("The active python3 does not belong to OSS CAD Suite. Open a fresh Terminal and rerun.")
 PY
     python3 -m pip --version
-    python3 -m pip install -r "$tt_dir/requirements.txt"
+    # This suite release includes apycula with two missing dependencies. Include
+    # them explicitly so the environment-wide pip check can complete.
+    python3 -m pip install -r "$tt_dir/requirements.txt" fastcrc msgspec
     python3 -m pip check
 
     # Activation is explicit so that other course tool environments can be used
