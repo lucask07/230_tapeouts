@@ -1,0 +1,75 @@
+
+  182  export PATH="/home/vboxuser/Documents/ossfpga_tools/oss-cad-suite-linux-x64-20261119/oss-cad-suite/bin:$PATH"
+  183  echo $PATH
+  184  source /home/vboxuser/Documents/ossfpga_tools/oss-cad-suite-linux-x64-20261119/oss-cad-suite/environment
+  185  git clone https://github.com/TinyTapeout/tt-support-tools.git tt
+  186  cd tt
+  187  pip install -r requirements.txt
+  188  sudo apt install python3-pip
+  189  tt/tt_fpga.py --help 
+  190  pip install -r requirements.txt
+  191  exit
+  192  ls /dev/ttyA*
+  193  pwd
+  194  cd Documents/
+  195  ls
+  196  cd ..
+  197  cd tt/
+  198  ls
+  199  cd ..
+  200  ls
+  201  cd ftest/
+  202  ls
+  203  ~/tt/tt_fpga.py configure --port /dev/ttyACM0 --upload --name ftest
+  204  source ~/Documents/ossfpga_tools/oss-cad-suite-linux-x64-20261119/oss-cad-suite/environment
+  205  ~/tt/tt_fpga.py configure --port /dev/ttyACM0 --upload --name ftest
+  206  ls
+  207  cd build/
+  208  ls
+  209  cd ..
+  210  ~/tt/tt_fpga.py configure --port /dev/ttyACM0 --upload --name tt_um_factory_test
+  211  ls -l /dev/ttyACM0
+  212  whoami
+  213  sudo adduser $USER dialout
+  214  ~/tt/tt_fpga.py configure --port /dev/ttyACM0 --upload --name tt_um_factory_test
+  215  whoami
+  216  groups
+  217  source ~/Documents/ossfpga_tools/oss-cad-suite-linux-x64-20261119/oss-cad-suite/environment
+  218  cd ..
+  219  cd ~
+  220  ls
+  221  cd ftest/
+  222  ~/tt/tt_fpga.py configure --port /dev/ttyACM0 --upload --name tt_um_factory_test
+  223  ~/tt/tt_fpga.py configure --help
+  224  ~/tt/tt_fpga.py configure --port /dev/ttyACM0 --upload --name tt_um_factory_test --set-default --clockrate 2000000
+  225  cat README.md 
+  226  cd ..
+  227  git clone https://github.com/adeleg815/finalproj_tapeout.git
+  228  cd finalproj_tapeout/
+  229  ls
+  230  cd src/
+  231  ls
+  232  cd ..
+  233  ~/tt/tt_fpga.py harden --top_module tt_um_top_module --source_dir src --source tt_um_top_module.v
+  234  cat src/tt_um_top_module.v 
+  235  head src/tt_um_top_module.v 
+  236  ~/tt/tt_fpga.py harden --top_module tt_um_top_module --source_dir src --source tt_um_top_module.v
+  237  ls
+  238  cd src/
+  239  ls
+  240  cat tt_um_top_module.v 
+  241  ls
+  242  cat top_module.v 
+  243  head top_module.v 
+  244  cd ..
+  245  ~/tt/tt_fpga.py harden --top_module tt_um_top_module --source_dir src --source tt_um_top_module.v
+  246  ls
+  247  vim info.yaml 
+  248  ~/tt/tt_fpga.py harden --top_module tt_um_top_module --source_dir src 
+  249  ls
+  250  cd build/
+  251  ls
+  252  cd ..
+  253  ~/tt/tt_fpga.py configure --port /dev/ttyACM0 --upload --name tt_um_top_module --set-default --clockrate 20000000
+  254  ~/tt/tt_fpga.py configure --port /dev/ttyACM0 --upload --name tt_um_top_module --set-default --clockrate 2000000
+  255  history | tail -n 300 > history.txt
